@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Guntur Transit Pulse — Public Transport Survey &amp; Analytics</title>
+<meta name="description" content="Survey-driven analysis of public transport usage patterns in Guntur: peak hours, mode share, passenger flow.">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;700;800&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0b1220; --surface:#111a2e; --surface-2:#16223d;
+    --text:#e7ecf5; --muted:#8a97b3; --border:#1f2c4d;
+    --primary:#3b82f6; --primary-2:#60a5fa;
+    --accent:#f59e0b; --accent-2:#fbbf24;
+    --success:#10b981; --danger:#ef4444;
+    --grad: linear-gradient(135deg,#3b82f6 0%,#8b5cf6 50%,#f59e0b 100%);
+  }
+  *{box-sizing:border-box}
+  html,body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,sans-serif}
+  h1,h2,h3,h4,h5,.display-1,.display-2,.display-3,.display-4,.display-5,.display-6{font-family:'Plus Jakarta Sans',sans-serif;letter-spacing:-.02em}
+  .navbar{background:rgba(11,18,32,.75);backdrop-filter:blur(14px);border-bottom:1px solid var(--border)}
+  .navbar-brand{font-family:'Plus Jakarta Sans';font-weight:800;color:var(--text)!important}
+  .nav-pill{color:var(--muted);padding:.5rem 1rem;border-radius:999px;font-weight:500;font-size:.9rem;cursor:pointer;transition:.2s;border:none;background:transparent}
+  .nav-pill:hover{color:var(--text);background:var(--surface)}
+  .nav-pill.active{background:var(--primary);color:#fff}
+  .brand-mark{width:38px;height:38px;border-radius:12px;background:var(--grad);display:grid;place-items:center;color:#fff}
+  .hero{position:relative;overflow:hidden;padding:5rem 0 4rem}
+  .hero::before{content:"";position:absolute;inset:-50% -10% auto auto;width:60%;height:120%;background:radial-gradient(closest-side,rgba(245,158,11,.25),transparent);filter:blur(40px);pointer-events:none}
+  .hero::after{content:"";position:absolute;inset:auto auto -30% -10%;width:55%;height:80%;background:radial-gradient(closest-side,rgba(59,130,246,.3),transparent);filter:blur(40px);pointer-events:none}
+  .badge-pill{display:inline-flex;align-items:center;gap:.5rem;background:rgba(245,158,11,.12);color:var(--accent-2);border:1px solid rgba(245,158,11,.3);padding:.4rem .9rem;border-radius:999px;font-size:.78rem;font-weight:600;text-transform:uppercase;letter-spacing:.08em}
+  .badge-pill .dot{width:8px;height:8px;border-radius:50%;background:var(--accent);animation:pulse 2s infinite}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+  .gradient-text{background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .btn-primary-cta{background:var(--primary);border:none;color:#fff;padding:.85rem 1.5rem;border-radius:999px;font-weight:600;transition:.2s;display:inline-flex;align-items:center;gap:.5rem}
+  .btn-primary-cta:hover{background:var(--primary-2);transform:translateY(-2px);box-shadow:0 10px 30px -10px rgba(59,130,246,.5);color:#fff}
+  .btn-ghost{background:var(--surface);border:1px solid var(--border);color:var(--text);padding:.85rem 1.5rem;border-radius:999px;font-weight:600;transition:.2s;display:inline-flex;align-items:center;gap:.5rem}
+  .btn-ghost:hover{border-color:var(--primary);color:#fff}
+  .btn-accent{background:var(--accent);color:#1a1208;border:none;padding:.75rem 1.4rem;border-radius:999px;font-weight:700;display:inline-flex;align-items:center;gap:.5rem}
+  .btn-accent:hover{background:var(--accent-2);color:#1a1208}
+  .card-soft{background:var(--surface);border:1px solid var(--border);border-radius:1.25rem;padding:1.75rem;transition:.25s}
+  .card-soft:hover{transform:translateY(-3px);border-color:rgba(59,130,246,.4)}
+  .obj-icon{width:48px;height:48px;border-radius:12px;background:rgba(59,130,246,.15);color:var(--primary-2);display:grid;place-items:center;font-size:1.4rem}
+  .card-soft:hover .obj-icon{background:var(--accent);color:#1a1208}
+  .form-control,.form-select{background:var(--surface-2);border:1px solid var(--border);color:var(--text);border-radius:.7rem;padding:.7rem .9rem}
+  .form-control:focus,.form-select:focus{background:var(--surface-2);color:var(--text);border-color:var(--primary);box-shadow:0 0 0 .2rem rgba(59,130,246,.2)}
+  .form-control::placeholder{color:var(--muted)}
+  .form-label{font-weight:600;font-size:.88rem;margin-bottom:.4rem}
+  .form-label .req{color:var(--danger)}
+  .section-eyebrow{font-size:.78rem;text-transform:uppercase;letter-spacing:.12em;color:var(--accent-2);font-weight:700;margin-bottom:.6rem}
+  .kpi{background:var(--surface);border:1px solid var(--border);border-radius:1rem;padding:1.25rem}
+  .kpi .label{font-size:.75rem;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;font-weight:600}
+  .kpi .value{font-family:'Plus Jakarta Sans';font-size:1.9rem;font-weight:800;margin-top:.3rem;line-height:1}
+  .kpi .sub{font-size:.78rem;color:var(--muted);margin-top:.3rem}
+  .chart-card{background:var(--surface);border:1px solid var(--border);border-radius:1.25rem;padding:1.5rem}
+  .chart-wrap{position:relative;height:300px}
+  .chart-wrap-tall{position:relative;height:340px}
+  section{scroll-margin-top:80px}
+  .footer{border-top:1px solid var(--border);padding:2rem 0;color:var(--muted);font-size:.88rem}
+  .empty{padding:3rem 1rem;text-align:center;color:var(--muted);border:1px dashed var(--border);border-radius:1rem}
+  .float-info{position:absolute;bottom:-1.5rem;left:-1.5rem;background:var(--surface);border:1px solid var(--border);border-radius:1rem;padding:1rem 1.25rem;max-width:230px;box-shadow:0 20px 50px -20px rgba(0,0,0,.5)}
+  .hero-img{border-radius:1.5rem;overflow:hidden;border:1px solid var(--border);background:var(--grad);aspect-ratio:4/3;position:relative;display:grid;place-items:center}
+  .hero-img i{font-size:9rem;color:rgba(255,255,255,.3)}
+  .toast-container
+      {
+        position:fixed;
+        top:80px;
+        right:20px;
+        z-index:1080}
+  .toast{background:var(--surface);color:var(--text);border:1px solid var(--border)}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="navbar navbar-expand sticky-top">
+  <div class="container">
+    <a class="navbar-brand d-flex align-items-center gap-2" href="#home">
+      <span class="brand-mark"><i class="bi bi-bus-front-fill"></i></span>
+      Guntur<span style="color:var(--accent)">.</span>Transit
+    </a>
+    <div class="d-flex gap-1">
+      <button class="nav-pill active" data-nav="home"><i class="bi bi-house-door"></i> <span class="d-none d-sm-inline">Home</span></button>
+      <button class="nav-pill" data-nav="survey"><i class="bi bi-clipboard-check"></i> <span class="d-none d-sm-inline">Survey</span></button>
+      <button class="nav-pill" data-nav="dashboard"><i class="bi bi-bar-chart-line"></i> <span class="d-none d-sm-inline">Analytics</span></button>
+    </div>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section id="home" class="hero">
+  <div class="container">
+    <div class="row align-items-center g-5">
+      <div class="col-lg-6">
+        <span class="badge-pill mb-3"><span class="dot"></span> Live survey · Guntur city</span>
+        <h1 class="display-3 fw-bold mb-3">Mapping the <span class="gradient-text">pulse</span> of Guntur's public transport.</h1>
+        <p class="lead text-secondary mb-4" style="color:var(--muted)!important;max-width:520px">A survey + analytics system that collects passenger trips to identify peak travel hours, mode preference and passenger flow — turning raw responses into route-optimization insight.</p>
+        <div class="d-flex flex-wrap gap-2">
+          <button class="btn-primary-cta" data-nav="survey">Take the survey <i class="bi bi-arrow-right"></i></button>
+          <button class="btn-ghost" data-nav="dashboard">View live analytics</button>
+        </div>
+      </div>
+      <div class="col-lg-6 position-relative">
+        <div class="hero-img"><i class="bi bi-bus-front"></i></div>
+        <div class="float-info">
+          <div style="font-size:.7rem;text-transform:uppercase;letter-spacing:.1em;color:var(--muted)">Peak hour insight</div>
+          <div style="font-family:'Plus Jakarta Sans';font-size:1.6rem;font-weight:800;margin-top:.25rem" id="heroPeak">01:00–02:00</div>
+          <div style="font-size:.75rem;color:var(--muted);margin-top:.25rem">Detected from live survey responses</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- OBJECTIVES -->
+<section style="background:rgba(255,255,255,.02);border-top:1px solid var(--border);border-bottom:1px solid var(--border)">
+  <div class="container py-5">
+    <div class="mb-5">
+      <div class="section-eyebrow">Project objectives</div>
+      <h2 class="display-5 fw-bold">Six goals. One survey-powered system.</h2>
+    </div>
+    <div class="row g-4">
+      <div class="col-md-6 col-lg-4"><div class="card-soft h-100"><div class="d-flex justify-content-between mb-3"><div class="obj-icon"><i class="bi bi-graph-up-arrow"></i></div><span style="color:var(--muted);font-family:'Plus Jakarta Sans'">01</span></div><h5 class="fw-bold">Usage Patterns</h5><p style="color:var(--muted)" class="mb-0">Analyze how citizens of Guntur use public transport day to day.</p></div></div>
+      <div class="col-md-6 col-lg-4"><div class="card-soft h-100"><div class="d-flex justify-content-between mb-3"><div class="obj-icon"><i class="bi bi-clock-history"></i></div><span style="color:var(--muted);font-family:'Plus Jakarta Sans'">02</span></div><h5 class="fw-bold">Peak Hours</h5><p style="color:var(--muted)" class="mb-0">Identify high-traffic windows from real departure &amp; return data.</p></div></div>
+      <div class="col-md-6 col-lg-4"><div class="card-soft h-100"><div class="d-flex justify-content-between mb-3"><div class="obj-icon"><i class="bi bi-people-fill"></i></div><span style="color:var(--muted);font-family:'Plus Jakarta Sans'">03</span></div><h5 class="fw-bold">Mode Preference</h5><p style="color:var(--muted)" class="mb-0">Determine the most-used modes — bus, auto, share-auto, train.</p></div></div>
+      <div class="col-md-6 col-lg-4"><div class="card-soft h-100"><div class="d-flex justify-content-between mb-3"><div class="obj-icon"><i class="bi bi-signpost-split"></i></div><span style="color:var(--muted);font-family:'Plus Jakarta Sans'">04</span></div><h5 class="fw-bold">Passenger Flow</h5><p style="color:var(--muted)" class="mb-0">Map flow across hours and corridors throughout the day.</p></div></div>
+      <div class="col-md-6 col-lg-4"><div class="card-soft h-100"><div class="d-flex justify-content-between mb-3"><div class="obj-icon"><i class="bi bi-database-check"></i></div><span style="color:var(--muted);font-family:'Plus Jakarta Sans'">05</span></div><h5 class="fw-bold">Web + SQL System</h5><p style="color:var(--muted)" class="mb-0">Web survey collects data; storage backend persists &amp; queries it.</p></div></div>
+      <div class="col-md-6 col-lg-4"><div class="card-soft h-100"><div class="d-flex justify-content-between mb-3"><div class="obj-icon"><i class="bi bi-bar-chart-line"></i></div><span style="color:var(--muted);font-family:'Plus Jakarta Sans'">06</span></div><h5 class="fw-bold">Live Reports</h5><p style="color:var(--muted)" class="mb-0">Auto-generated reports update with every new submission.</p></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- SURVEY -->
+<section id="survey" class="py-5">
+  <div class="container" style="max-width:880px">
+    <div class="text-center mb-5">
+      <div class="section-eyebrow">Passenger survey</div>
+      <h2 class="display-5 fw-bold">Tell us about your trip</h2>
+      <p style="color:var(--muted)">Takes ~2 minutes. Every response feeds the live analytics dashboard.</p>
+    </div>
+    <form id="surveyForm" class="card-soft">
+      <div class="row g-3">
+        <div class="col-md-4"><label class="form-label">Age group <span class="req">*</span></label>
+          <select class="form-select" name="age_group" required="">
+            <option value="">Select…</option><option>Under 18</option><option>18-25</option><option>26-35</option><option>36-50</option><option>51-65</option><option>Over 65</option>
+          </select></div>
+        <div class="col-md-4"><label class="form-label">Gender <span class="req">*</span></label>
+          <select class="form-select" name="gender" required="">
+            <option value="">Select…</option><option>Male</option><option>Female</option><option>Other</option><option>Prefer not to say</option>
+          </select></div>
+        <div class="col-md-4"><label class="form-label">Occupation <span class="req">*</span></label>
+          <select class="form-select" name="occupation" required="">
+            <option value="">Select…</option><option>Student</option><option>Salaried employee</option><option>Self-employed</option><option>Daily wage worker</option><option>Homemaker</option><option>Retired</option><option>Other</option>
+          </select></div>
+
+        <div class="col-md-6"><label class="form-label">Origin area in Guntur <span class="req">*</span></label>
+          <input class="form-control" name="origin_area" placeholder="e.g., Brodipet, Lakshmipuram" required=""></div>
+        <div class="col-md-6"><label class="form-label">Destination area <span class="req">*</span></label>
+          <input class="form-control" name="destination_area" placeholder="e.g., Arundelpet, AT Agraharam" required=""></div>
+
+        <div class="col-md-6"><label class="form-label">Primary mode of transport <span class="req">*</span></label>
+          <select class="form-select" name="primary_mode" required="">
+            <option value="">Select…</option><option>City Bus (APSRTC)</option><option>Auto Rickshaw</option><option>Share Auto</option><option>Train</option><option>Two-wheeler</option><option>Cab / Taxi</option><option>Bicycle</option><option>Walking</option>
+          </select></div>
+        <div class="col-md-6"><label class="form-label">Trip purpose <span class="req">*</span></label>
+          <select class="form-select" name="trip_purpose" required="">
+            <option value="">Select…</option><option>Work / Office</option><option>Education</option><option>Shopping</option><option>Medical</option><option>Social / Leisure</option><option>Other</option>
+          </select></div>
+
+        <div class="col-md-6"><label class="form-label">Departure hour (0-23) <span class="req">*</span></label>
+          <input type="number" min="0" max="23" class="form-control" name="departure_hour" placeholder="e.g., 8" required=""></div>
+        <div class="col-md-6"><label class="form-label">Return hour (0-23) <span class="req">*</span></label>
+          <input type="number" min="0" max="23" class="form-control" name="return_hour" placeholder="e.g., 18" required=""></div>
+
+        <div class="col-md-4"><label class="form-label">Travel duration (min) <span class="req">*</span></label>
+          <input type="number" min="1" max="300" class="form-control" name="travel_duration_min" required=""></div>
+        <div class="col-md-4"><label class="form-label">Waiting time (min) <span class="req">*</span></label>
+          <input type="number" min="0" max="120" class="form-control" name="waiting_time_min" required=""></div>
+        <div class="col-md-4"><label class="form-label">Travel frequency <span class="req">*</span></label>
+          <select class="form-select" name="travel_frequency" required="">
+            <option value="">Select…</option><option>Daily</option><option>4-6 times/week</option><option>2-3 times/week</option><option>Once a week</option><option>Occasionally</option>
+          </select></div>
+
+        <div class="col-md-6"><label class="form-label">Monthly transport spend (₹) <span class="req">*</span></label>
+          <input type="number" min="0" max="50000" class="form-control" name="monthly_spend" required=""></div>
+        <div class="col-md-6"><label class="form-label">Satisfaction (1-5) <span class="req">*</span></label>
+          <input type="number" min="1" max="5" class="form-control" name="satisfaction" required=""></div>
+
+        <div class="col-12"><label class="form-label">Suggestions for improvement <small style="color:var(--muted);font-weight:400">(optional)</small></label>
+          <textarea class="form-control" name="suggestions" rows="3" placeholder="What would make your trip better?"></textarea></div>
+
+        <div class="col-12 d-flex flex-wrap gap-2 pt-2">
+          <button type="submit" class="btn-primary-cta">Submit response <i class="bi bi-send"></i></button>
+          <button type="reset" class="btn-ghost">Clear form</button>
+        </div>
+      </div>
+    </form>
+  </div>
+</section>
+
+<!-- DASHBOARD -->
+<section id="dashboard" class="py-5" style="background:rgba(255,255,255,.02);border-top:1px solid var(--border)">
+  <div class="container">
+    <div class="d-flex flex-wrap justify-content-between align-items-end mb-4 gap-3">
+      <div>
+        <div class="section-eyebrow">Live analytics</div>
+        <h2 class="display-5 fw-bold mb-1">Survey insights</h2>
+        <p style="color:var(--muted);margin:0">Auto-updates as new responses come in. Total: <strong id="totalCount" style="color:var(--text)">1</strong></p>
+      </div>
+      <div class="d-flex flex-wrap gap-2">
+        <button class="btn-ghost" id="seedBtn" title="Add 50 sample responses for demo"><i class="bi bi-magic"></i> Seed sample data</button>
+        <button class="btn-ghost" id="csvBtn"><i class="bi bi-filetype-csv"></i> Export CSV</button>
+        <button class="btn-accent" id="pdfBtn"><i class="bi bi-file-earmark-pdf"></i> Generate PDF report</button>
+      </div>
+    </div>
+
+    <div id="emptyState" class="empty" style="display: none;">
+      <i class="bi bi-inbox" style="font-size:2.5rem"></i>
+      <p class="mt-2 mb-0">No responses yet. Submit the survey above or click <strong>Seed sample data</strong> to see the dashboard come alive.</p>
+    </div>
+
+    <div id="dashContent" style="display: block;">
+      <!-- KPIs -->
+      <div class="row g-3 mb-4">
+        <div class="col-6 col-md-3"><div class="kpi"><div class="label">Peak departure</div><div class="value" id="kpiPeakDep">01:00–02:00</div><div class="sub" id="kpiPeakDepSub">1 trips logged</div></div></div>
+        <div class="col-6 col-md-3"><div class="kpi"><div class="label">Top mode</div><div class="value" id="kpiTopMode">Auto</div><div class="sub" id="kpiTopModeSub">100% of riders</div></div></div>
+        <div class="col-6 col-md-3"><div class="kpi"><div class="label">Avg wait time</div><div class="value" id="kpiWait">10.0</div><div class="sub">minutes</div></div></div>
+        <div class="col-6 col-md-3"><div class="kpi"><div class="label">Avg satisfaction</div><div class="value" id="kpiSat">5.0</div><div class="sub">out of 5</div></div></div>
+      </div>
+
+      <!-- Charts -->
+      <div class="row g-4">
+        <div class="col-12">
+          <div class="chart-card">
+            <h5 class="fw-bold mb-1">Passenger flow throughout the day</h5>
+            <p style="color:var(--muted);font-size:.88rem">Combined departures + returns per hour</p>
+            <div class="chart-wrap-tall"><canvas id="chartFlow" width="61" height="340" style="display: block; box-sizing: border-box; height: 340px; width: 61px;"></canvas></div>
+          </div>
+        </div>
+        <div class="col-lg-6">
+          <div class="chart-card">
+            <h5 class="fw-bold mb-1">Peak hours: departures vs returns</h5>
+            <p style="color:var(--muted);font-size:.88rem">Hourly distribution</p>
+            <div class="chart-wrap"><canvas id="chartPeak" width="61" height="300" style="display: block; box-sizing: border-box; height: 300px; width: 61px;"></canvas></div>
+          </div>
+        </div>
+        <div class="col-lg-6">
+          <div class="chart-card">
+            <h5 class="fw-bold mb-1">Mode preference</h5>
+            <p style="color:var(--muted);font-size:.88rem">Share of responses by primary mode</p>
+            <div class="chart-wrap"><canvas id="chartModes" width="61" height="300" style="display: block; box-sizing: border-box; height: 300px; width: 61px;"></canvas></div>
+          </div>
+        </div>
+        <div class="col-lg-6">
+          <div class="chart-card">
+            <h5 class="fw-bold mb-1">Trip purpose</h5>
+            <div class="chart-wrap"><canvas id="chartPurpose" width="61" height="300" style="display: block; box-sizing: border-box; height: 300px; width: 61px;"></canvas></div>
+          </div>
+        </div>
+        <div class="col-lg-6">
+          <div class="chart-card">
+            <h5 class="fw-bold mb-1">Top corridors (origin → destination)</h5>
+            <div class="chart-wrap"><canvas id="chartCorridor" width="61" height="300" style="display: block; box-sizing: border-box; height: 300px; width: 61px;"></canvas></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="mt-4 d-flex justify-content-end">
+        <button class="btn-ghost" id="clearBtn"><i class="bi bi-trash3"></i> Clear all data</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer class="footer">
+  <div class="container d-flex flex-wrap justify-content-between gap-2">
+    <div>© <span id="yr">2026</span> Guntur Transit Pulse · Survey-driven research project</div>
+    <div>Built with HTML, Bootstrap, Chart.js — data stored locally in your browser</div>
+  </div>
+</footer>
+
+<div class="toast-container"><div id="toast" class="toast fade hide" role="alert"><div class="toast-body" id="toastBody">✓ Response saved. Thank you!</div></div></div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+<script>
+/* ---------- storage (acts as SQL-like single table) ---------- */
+const STORE_KEY = 'guntur_transit_responses';
+const load = () => { try { return JSON.parse(localStorage.getItem(STORE_KEY)) || []; } catch { return []; } };
+const save = (rows) => localStorage.setItem(STORE_KEY, JSON.stringify(rows));
+document.getElementById('yr').textContent = new Date().getFullYear();
+
+/* ---------- nav ---------- */
+document.querySelectorAll('[data-nav]').forEach(b=>b.addEventListener('click',()=>{
+  const id=b.dataset.nav; document.getElementById(id).scrollIntoView({behavior:'smooth'});
+  document.querySelectorAll('.nav-pill').forEach(p=>p.classList.toggle('active',p.dataset.nav===id));
+}));
+
+/* ---------- toast ---------- */
+const toastEl=document.getElementById('toast'); const toast=new bootstrap.Toast(toastEl,{delay:2500});
+const notify=(msg)=>{document.getElementById('toastBody').textContent=msg;toast.show();}
+
+/* ---------- form submit ---------- */
+document.getElementById('surveyForm').addEventListener('submit',(e)=>{
+  e.preventDefault();
+  const fd=new FormData(e.target); const obj={id:crypto.randomUUID(),created_at:new Date().toISOString()};
+  fd.forEach((v,k)=>obj[k]=['departure_hour','return_hour','travel_duration_min','waiting_time_min','monthly_spend','satisfaction'].includes(k)?Number(v):v);
+  const rows=load(); rows.push(obj); save(rows);
+  e.target.reset(); notify('✓ Response saved. Thank you!'); render();
+});
+
+/* ---------- seed / clear / export ---------- */
+const SAMPLE_MODES=['City Bus (APSRTC)','City Bus (APSRTC)','City Bus (APSRTC)','Auto Rickshaw','Auto Rickshaw','Share Auto','Share Auto','Train','Two-wheeler','Cab / Taxi','Walking'];
+const SAMPLE_AREAS=['Brodipet','Arundelpet','Lakshmipuram','AT Agraharam','Pattabhipuram','Nallapadu','Etukuru','Kothapet','Naaz Center','Gorantla'];
+const SAMPLE_PURPOSE=['Work / Office','Work / Office','Education','Education','Shopping','Medical','Social / Leisure'];
+const SAMPLE_FREQ=['Daily','Daily','4-6 times/week','2-3 times/week','Once a week','Occasionally'];
+const peakHours=[7,8,8,8,9,9,10,12,17,17,18,18,18,19,19];
+const pick=(a)=>a[Math.floor(Math.random()*a.length)];
+document.getElementById('seedBtn').addEventListener('click',()=>{
+  const rows=load();
+  for(let i=0;i<50;i++){
+    const dep=pick(peakHours); const ret=Math.min(23,dep+8+Math.floor(Math.random()*3));
+    rows.push({id:crypto.randomUUID(),created_at:new Date().toISOString(),
+      age_group:pick(['18-25','26-35','26-35','36-50','51-65']),gender:pick(['Male','Female','Female','Male']),
+      occupation:pick(['Student','Salaried employee','Salaried employee','Self-employed','Daily wage worker']),
+      origin_area:pick(SAMPLE_AREAS),destination_area:pick(SAMPLE_AREAS),
+      primary_mode:pick(SAMPLE_MODES),trip_purpose:pick(SAMPLE_PURPOSE),
+      departure_hour:dep,return_hour:ret,
+      travel_duration_min:10+Math.floor(Math.random()*40),waiting_time_min:2+Math.floor(Math.random()*20),
+      travel_frequency:pick(SAMPLE_FREQ),monthly_spend:300+Math.floor(Math.random()*2200),
+      satisfaction:1+Math.floor(Math.random()*5),suggestions:''});
+  }
+  save(rows); notify('✓ 50 sample responses added'); render();
+});
+document.getElementById('clearBtn').addEventListener('click',()=>{
+  if(confirm('Delete all responses? This cannot be undone.')){save([]);notify('All data cleared');render();}
+});
+document.getElementById('csvBtn').addEventListener('click',()=>{
+  const rows=load(); if(!rows.length) return notify('No data to export');
+  const cols=Object.keys(rows[0]);
+  const csv=[cols.join(','),...rows.map(r=>cols.map(c=>`"${String(r[c]??'').replace(/"/g,'""')}"`).join(','))].join('\n');
+  const blob=new Blob([csv],{type:'text/csv'}); const url=URL.createObjectURL(blob);
+  const a=document.createElement('a'); a.href=url; a.download=`guntur-transit-${Date.now()}.csv`; a.click(); URL.revokeObjectURL(url);
+});
+
+/* ---------- analytics ---------- */
+const COLORS=['#3b82f6','#f59e0b','#10b981','#8b5cf6','#ef4444','#06b6d4','#ec4899','#84cc16','#f97316','#a855f7','#14b8a6'];
+let charts={};
+function destroyCharts(){Object.values(charts).forEach(c=>c&&c.destroy());charts={};}
+function topN(map,n=8){return Object.entries(map).sort((a,b)=>b[1]-a[1]).slice(0,n);}
+function makeChart(id,cfg){const el=document.getElementById(id);if(!el)return;charts[id]=new Chart(el,cfg);}
+
+Chart.defaults.color='#8a97b3'; Chart.defaults.borderColor='#1f2c4d'; Chart.defaults.font.family="'Inter',sans-serif";
+
+function render(){
+  const rows=load(); document.getElementById('totalCount').textContent=rows.length;
+  if(!rows.length){
+    document.getElementById('emptyState').style.display='block';
+    document.getElementById('dashContent').style.display='none';
+    document.getElementById('heroPeak').textContent='—';
+    destroyCharts(); return;
+  }
+  document.getElementById('emptyState').style.display='none';
+  document.getElementById('dashContent').style.display='block';
+
+  // hourly arrays
+  const dep=Array(24).fill(0), ret=Array(24).fill(0);
+  rows.forEach(r=>{dep[r.departure_hour]++; ret[r.return_hour]++;});
+  const flow=dep.map((d,i)=>d+ret[i]);
+  const labels=Array.from({length:24},(_,i)=>`${String(i).padStart(2,'0')}:00`);
+
+  // peak window
+  let peakIdx=0,peakV=0; flow.forEach((v,i)=>{if(v>peakV){peakV=v;peakIdx=i;}});
+  const peakLabel=`${String(peakIdx).padStart(2,'0')}:00–${String((peakIdx+1)%24).padStart(2,'0')}:00`;
+  document.getElementById('kpiPeakDep').textContent=peakLabel;
+  document.getElementById('kpiPeakDepSub').textContent=`${peakV} trips logged`;
+  document.getElementById('heroPeak').textContent=peakLabel;
+
+  // mode share
+  const modes={}; rows.forEach(r=>modes[r.primary_mode]=(modes[r.primary_mode]||0)+1);
+  const modeTop=topN(modes,1)[0]||['—',0];
+  document.getElementById('kpiTopMode').textContent=modeTop[0].split(' ')[0];
+  document.getElementById('kpiTopModeSub').textContent=`${Math.round(modeTop[1]/rows.length*100)}% of riders`;
+
+  // wait + satisfaction
+  const avg=(arr)=>arr.reduce((a,b)=>a+b,0)/arr.length;
+  document.getElementById('kpiWait').textContent=avg(rows.map(r=>r.waiting_time_min)).toFixed(1);
+  document.getElementById('kpiSat').textContent=avg(rows.map(r=>r.satisfaction)).toFixed(1);
+
+  destroyCharts();
+
+  makeChart('chartFlow',{type:'line',data:{labels,datasets:[{label:'Passenger flow',data:flow,borderColor:'#3b82f6',backgroundColor:'rgba(59,130,246,.2)',fill:true,tension:.4,borderWidth:2,pointRadius:3}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}}}});
+
+  makeChart('chartPeak',{type:'bar',data:{labels,datasets:[
+    {label:'Departures',data:dep,backgroundColor:'#3b82f6'},
+    {label:'Returns',data:ret,backgroundColor:'#f59e0b'}]},
+    options:{responsive:true,maintainAspectRatio:false,scales:{x:{stacked:false},y:{beginAtZero:true}}}});
+
+  const modeEntries=topN(modes,10);
+  makeChart('chartModes',{type:'doughnut',data:{labels:modeEntries.map(e=>e[0]),datasets:[{data:modeEntries.map(e=>e[1]),backgroundColor:COLORS,borderColor:'#111a2e',borderWidth:2}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'right',labels:{boxWidth:12,padding:10,font:{size:11}}}}}});
+
+  const purpose={}; rows.forEach(r=>purpose[r.trip_purpose]=(purpose[r.trip_purpose]||0)+1);
+  const purposeEntries=topN(purpose,8);
+  makeChart('chartPurpose',{type:'bar',data:{labels:purposeEntries.map(e=>e[0]),datasets:[{label:'Trips',data:purposeEntries.map(e=>e[1]),backgroundColor:'#10b981'}]},options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}}}});
+
+  const corr={}; rows.forEach(r=>{const k=`${r.origin_area} → ${r.destination_area}`;corr[k]=(corr[k]||0)+1;});
+  const corrEntries=topN(corr,8);
+  makeChart('chartCorridor',{type:'bar',data:{labels:corrEntries.map(e=>e[0]),datasets:[{label:'Trips',data:corrEntries.map(e=>e[1]),backgroundColor:'#8b5cf6'}]},options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}}}});
+}
+
+/* ---------- PDF report ---------- */
+document.getElementById('pdfBtn').addEventListener('click',async()=>{
+  const rows=load(); if(!rows.length) return notify('No data to export');
+  notify('Generating PDF…');
+  const { jsPDF } = window.jspdf; const pdf=new jsPDF('p','mm','a4');
+  const pw=pdf.internal.pageSize.getWidth(), ph=pdf.internal.pageSize.getHeight();
+  // header
+  pdf.setFillColor(59,130,246); pdf.rect(0,0,pw,28,'F');
+  pdf.setTextColor(255); pdf.setFont('helvetica','bold'); pdf.setFontSize(18);
+  pdf.text('Guntur Transit Pulse — Survey Report',12,14);
+  pdf.setFontSize(10); pdf.setFont('helvetica','normal');
+  pdf.text(`Generated ${new Date().toLocaleString()} · ${rows.length} responses`,12,22);
+
+  pdf.setTextColor(20); let y=38;
+  pdf.setFont('helvetica','bold'); pdf.setFontSize(13); pdf.text('Executive summary',12,y); y+=6;
+  pdf.setFont('helvetica','normal'); pdf.setFontSize(10);
+  const lines=[
+    `Peak departure window: ${document.getElementById('kpiPeakDep').textContent}`,
+    `Top mode of transport: ${document.getElementById('kpiTopMode').textContent} (${document.getElementById('kpiTopModeSub').textContent})`,
+    `Average waiting time: ${document.getElementById('kpiWait').textContent} minutes`,
+    `Average satisfaction: ${document.getElementById('kpiSat').textContent} / 5`,
+  ];
+  lines.forEach(l=>{pdf.text('• '+l,14,y);y+=6;});
+  y+=4;
+
+  const cards=['chartFlow','chartPeak','chartModes','chartPurpose','chartCorridor'];
+  for(const id of cards){
+    const card=document.getElementById(id).closest('.chart-card');
+    const canvas=await html2canvas(card,{backgroundColor:'#111a2e',scale:2});
+    const img=canvas.toDataURL('image/png');
+    const w=pw-24; const h=canvas.height*(w/canvas.width);
+    if(y+h>ph-12){pdf.addPage();y=14;}
+    pdf.addImage(img,'PNG',12,y,w,h); y+=h+6;
+  }
+  pdf.save(`guntur-transit-report-${Date.now()}.pdf`); notify('✓ PDF downloaded');
+});
+
+render();
+</script>
+
+
+</body></html>
